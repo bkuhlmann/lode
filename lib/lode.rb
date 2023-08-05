@@ -6,4 +6,6 @@ Zeitwerk::Loader.for_gem.setup
 
 # Main namespace.
 module Lode
+  PRIMARY_KEY = :id
+  MODES = %i[default thread file max].freeze
 end
