@@ -1,0 +1,18 @@
+= Versions
+
+== 0.0.0 (2023-08-05)
+
+* Added Dry Monads gem - Brooke Kuhlmann
+* Added RSpec link fixture - Brooke Kuhlmann
+* Added RSpec table operations shared examples - Brooke Kuhlmann
+* Added abstract table - Brooke Kuhlmann
+* Added client - Brooke Kuhlmann
+* Added configuration - Brooke Kuhlmann
+* Added dictionary table - Brooke Kuhlmann
+* Added documentation - Brooke Kuhlmann
+* Added persistent store refinements - Brooke Kuhlmann
+* Added primary key and modes - Brooke Kuhlmann
+* Added primary public interface - Brooke Kuhlmann
+* Added project skeleton - Brooke Kuhlmann
+* Added setting - Brooke Kuhlmann
+* Added value table - Brooke Kuhlmann
