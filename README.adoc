@@ -2,17 +2,29 @@
 :toclevels: 5
 :figure-caption!:
 
+:dry_monads_link: link:https://dry-rb.org/gems/dry-monads[Dry Monads]
+:pstore_link: link:https://github.com/ruby/pstore[PStore]
+:ruby_link: link:https://www.ruby-lang.org[Ruby]
+:xdg_link: link:https://alchemists.io/projects/xdg[XDG]
+
 = Lode
+
+Lode -- as in a geological deposit or a vein of minerals -- is a {pstore_link} of object data that can be mined for valuable information.
+
+As noted in the {pstore_link} documentation all objects are marshaled which is not without caveats and dangers but, if you only need a simple object store, {pstore_link} is a solution. Lode takes this a step further by allowing you to have a pipeline workflow with a Domain Specific Language (DSL) for creating, updating, finding, and deleting records.
 
 toc::[]
 
 == Features
 
-== Screencasts
+- Built atop {pstore_link}.
+- Uses the _Railway Pattern_ via {dry_monads_link} for fault tolerant pipelines.
+- Emphasizes use of `Hash`, `Data`, `Struct`, or link:https://alchemists.io/projects/wholable[whole value objects] in general.
+- Great for {xdg_link} caches, simple file-based databases, or simple file stores in general.
 
 == Requirements
 
-. link:https://www.ruby-lang.org[Ruby].
+. {ruby_link}.
 
 == Setup
 
@@ -47,6 +59,230 @@ require "lode"
 ----
 
 == Usage
+
+To use, create a Lode instance and then use database-like messages to interact with your table of records as desired. For example, the following creates a table of _links_ and stores them within the `demo.store` file and then interacts with those records:
+
+[source,ruby]
+----
+lode = Lode.new "demo.store"
+
+lode.commit :links do
+  upsert({id: 1, url: "https://one.com"})
+  upsert({id: 2, url: "https://2.com"})
+  upsert({id: 3, url: "https://three.com"})
+end
+
+# Success({:id=>3, :url=>"https://three.com"})
+# (only the last record created/updated is answered back)
+
+lode.commit(:links) { upsert({id: 2, url: "https://two.com"}) }
+# Success({:id=>2, :url=>"https://two.com"})
+
+lode.commit(:links) { find 1 }
+# Success({:id=>1, :url=>"https://one.com"})
+
+lode.commit(:links) { find 13 }
+# Failure("Unable to find id: 13.")
+
+lode.commit(:links) { delete 2 }
+# Success({:id=>2, :url=>"https://two.com"})
+
+lode.commit(:links) { delete 13 }
+# Failure("Unable to find id: 13.")
+
+lode.commit(:links, &:all)
+# Success([{:id=>1, :url=>"https://one.com"}, {:id=>3, :url=>"https://three.com"}])
+----
+
+The default configuration is set up to use a primitive `Hash` which is the default behavior when using {pstore_link}. Everything answered back is a result monad as provided by the {dry_monads_link} gem so you can leverage the _Railway Pattern_ to build robust, fault tolerant, pipelines.
+
+=== Configuration
+
+Lode can be configured using a block or a keyword argument. The following are identical:
+
+[source,ruby]
+----
+# With block.
+lode = Lode.new "demo.store" do |config|
+  config.mode = :max
+  config.table = Lode::Tables::Value
+  config.primary_key = :name
+end
+
+# With keyword argument.
+configuration = Lode::Configuration[mode: :max, table: Lode::Tables::Value, primary_key: :name]
+lode = Lode.new "demo.store", configuration:
+----
+
+The default configuration consists of the following attributes:
+
+[source,ruby]
+----
+Lode::Configuration[
+  store: PStore,
+  mode: :default,
+  table: Lode::Tables::Dictionary,
+  primary_key: :id,
+  registry: {}
+]
+----
+
+Each key can be configured as follows:
+
+* `store`: Any object that adhere's to the {pstore_link} Object API. You'll most likely never need to change this but is available if desired. Default: `PStore`.
+* `mode`: The mode determines {pstore_link} behavior and can be one of the following:
+** `:default`: The default mode and is identical to `PStore.new path`.
+** `:thread`: Ensures a thread safe `PStore` instance is created. This is identical to `PStore.new path, true`.
+** `:file`: Ensures a file safe `PStore` instance is created. This is identical to setting `store.ultra_safe = true` on a `PStore` instance.
+** `:max`: Ensures a thread _and_ file safe `PStore` instance is created for situations where you need maximum safety.
+* `table`: Defines the _type_ of table used to interact with your records. The following values are supported:
+** `Lode::Tables::Dictionary`: The default value which allows you to interact with a `Hash` of records but would also work with any object that can respond to `+#[]+` and `+#[]=+`.
+** `Lode::Tables::Value`: Allows you to interact with whole value objects like `Data`, `Struct`, or link:https://alchemists.io/projects/wholable[whole value objects] in general which have attribute readers and writers.
+* `primary_key`: Defines the primary key used when interacting with your table of records (useful when finding or upserting records). Default: `:id`.
+* `registry`: Used for registering default settings for your tables. _This is not meant to be used directly_ but is documented for transparency.
+
+=== Registry
+
+The registry is part of the configuration and directly accessible via a Lode instance. The registry allows you to customize individual table behavior as desired. For instance, you could have a `Hash` table or value table (i.e. `Data`, `Struct`, etc). Additionally, each table can have different primary keys too. The registry accepts three arguments in this format:
+
+....
+key, model:, primary_key:
+....
+
+The default model is a `Hash` but could be `Data`, `Struct`, or any value object. The default primary key is `:id` but could be any attribute that uniquely identifies a record. This means the following is identical when registering default table settings:
+
+[source,ruby]
+----
+# Initialization with registration.
+lode = Lode.new("demo.store") { |config| config.register :links, primary_key: :slug }
+
+# Direct registration.
+lode = Lode.new "demo.store"
+lode.register :links, primary_key: :slug
+----
+
+Given the above, you could now create and find _link_ records by _slug_ like so:
+
+[source,ruby]
+----
+lode.commit(:links) { upsert({id: 1, slug: :demo, url: "https://demo.com"}) }
+lode.read(:links) { find :demo }
+
+# Success({:id=>1, :slug=>:demo, :url=>"https://demo.com"})
+----
+
+Keep in mind that the registry _only defines default behavior_. You can override default behavior by specifying a key. Example:
+
+[source,ruby]
+----
+lode.read(:links) { find 1, key: :id }
+# Success({:id=>1, :slug=>:demo, :url=>"https://demo.com"})
+----
+
+Even though the default primary key was registered to be `:slug`, we were able to use `:id` instead. The optional `:key` keyword argument is also available for _all_ table methods.
+
+=== Tables
+
+As mentioned when configuring a Lode instance, two _types_ of tables are available to you. The default (i.e. `Lode::Tables::Dictionary`) allows you to interact with `Hash` records which is compatible with default `PStore` functionality. Example:
+
+[source,ruby]
+----
+lode = Lode.new "demo.store"
+lode.commit(:links) { upsert({id: 1, url: "https://one.com"}) }
+# Success({:id=>1, :url=>"https://one.com"})
+----
+
+The second, and more powerful table type, is a value object table (i.e. `Lode::Tables::Value`). Here's an example using a `Data` model:
+
+[source,ruby]
+----
+Model = Data.define :id, :url
+
+lode = Lode.new("demo.store") do |config|
+  config.table = Lode::Tables::Value
+  config.register :links, model: Model
+end
+
+lode.commit :links do
+  upsert({id: 1, url: "https://one.com"})
+  upsert Model[id: 2, url: "https://"]
+end
+
+lode.commit(:links, &:all)
+# Success([#<data Model id=1, url="https://one.com">, #<data Model id=2, url="https://">])
+----
+
+The above would work with a `Struct` or any value object. One of many conveniences when using value objects -- as shown above -- is you can upsert records using a `Hash` or an instance of your value object.
+
+Each table supports the following methods:
+
+* `#primary_key`: Answers the primary key as defined when the table was registered or the default key (i.e. `:id`).
+* `#all`: Answers all records for a table.
+* `#find`: Finds a record by primary key.
+* `#upsert`: Creates or updates a new or existing record by primary key.
+* `#delete`: Deletes an existing record by primary key.
+
+All of the above (except `#primary_key`) support an optional `:key` keyword argument which allows you to use a different key that is not the primary key if desired.
+
+=== Read/Write
+
+You've already seen a few examples of how to read and write to your object store but, to be explicit, the following are supported:
+
+* `#commit`: Allows you to read and write records as a single transaction.
+* `#read`: Allows you to _only_ read data from your object store as a single transaction. Write operations will result in an exception.
+
+Both of the above methods require you to supply the table name and a block with operations. Since a table name must always be supplied this means you can interact with multiple tables within the same file store or you can write different tables to different files. Up to you. Here's an example of a basic write and read operation:
+
+[source,ruby]
+----
+lode = Lode.new "demo.store"
+
+# Read/Write
+lode.commit(:links) { upsert({id: 1, url: "https://demo.com"}) }
+
+# Read Only
+lode.read(:links) { find 1 }
+----
+
+Attempting to `#read` with a _write_ operation will result in an error. Example:
+
+[source,ruby]
+----
+lode.read(:links) { delete 1 }
+# in read-only transaction (PStore::Error)
+----
+
+For those familiar with {pstore_link} behavior, a commit and read operation is the equivalent of the following using `PStore` directly:
+
+[source,ruby]
+----
+require "pstore"
+
+store = PStore.new "demo.store"
+
+# Read/Write
+store.transaction do |store|
+  store[:links] = store.fetch(:links, []).append({id: 1, url: "https://demo.com"})
+end
+
+# [{:id=>1, :url=>"https://demo.com"}]
+
+# Read Only
+store.transaction(true) { |store| store.fetch(:links, []).find { |record| record[:id] == 1 } }
+# {:id=>1, :url=>"https://demo.com"}
+----
+
+=== Store
+
+If at any time you need access to the original `PStore` instance, you can ask for it. Example:
+
+[source,ruby]
+----
+lode = Lode.new "demo.store"
+load.store
+
+# #<PStore:0x000000010c592178 @abort=false, @filename="demo.store", @lock=#<Thread::Mutex:0x000000010c5fbfd8>, @thread_safe=false, @ultra_safe=false>
+----
 
 == Development
 
