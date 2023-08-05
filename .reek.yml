@@ -3,5 +3,14 @@ exclude_paths:
   - vendor
 
 detectors:
+  ControlParameter:
+    exclude:
+      - "singleton_class#with"
+  DuplicateMethodCall:
+    exclude:
+      - "singleton_class#with"
   LongParameterList:
     enabled: false
+  TooManyStatements:
+    exclude:
+      - "singleton_class#with"
