@@ -6,6 +6,9 @@ detectors:
   ControlParameter:
     exclude:
       - "singleton_class#with"
+  DataClump:
+    exclude:
+      - "Lode::Tables::Abstract"
   DuplicateMethodCall:
     exclude:
       - "singleton_class#with"
@@ -17,3 +20,7 @@ detectors:
   ModuleInitialize:
     exclude:
       - "Lode"
+  UnusedParameters:
+    exclude:
+      - "Lode::Tables::Abstract#find"
+      - "Lode::Tables::Abstract#upsert"
