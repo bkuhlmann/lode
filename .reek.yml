@@ -14,3 +14,6 @@ detectors:
   TooManyStatements:
     exclude:
       - "singleton_class#with"
+  ModuleInitialize:
+    exclude:
+      - "Lode"
