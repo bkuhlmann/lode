@@ -8,4 +8,6 @@ Zeitwerk::Loader.for_gem.setup
 module Lode
   PRIMARY_KEY = :id
   MODES = %i[default thread file max].freeze
+
+  def self.new(...) = Client.new(...)
 end
