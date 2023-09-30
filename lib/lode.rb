@@ -13,5 +13,7 @@ module Lode
   PRIMARY_KEY = :id
   MODES = %i[default thread file max].freeze
 
+  def self.loader(registry = Zeitwerk::Registry) = registry.loader_for __FILE__
+
   def self.new(...) = Client.new(...)
 end
