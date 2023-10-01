@@ -1,5 +1,11 @@
 = Versions
 
+== 0.1.0 (2023-09-30)
+
+* Fixed Zeitwerk loader - Brooke Kuhlmann
+* Added gem loader - Brooke Kuhlmann
+* Updated GitHub issue template with simplified sections - Brooke Kuhlmann
+
 == 0.0.0 (2023-08-05)
 
 * Added Dry Monads gem - Brooke Kuhlmann
