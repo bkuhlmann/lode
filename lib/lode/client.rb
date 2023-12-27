@@ -27,10 +27,12 @@ module Lode
 
     attr_reader :configuration
 
-    def transact(mode, key, &)
+    # rubocop:todo Naming/BlockForwarding
+    def transact mode, key, &block
       store.transaction mode == :read do
-        configuration.table_for(store, key).instance_eval(&)
+        configuration.table_for(store, key).instance_eval(&block)
       end
     end
+    # rubocop:enable Naming/BlockForwarding
   end
 end
