@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require "pstore"
-require "refinements/arrays"
+require "refinements/array"
 
 module Lode
   module Refines
     # Refined and enhanced PStore functionality.
     module PersistentStore
-      using Refinements::Arrays
+      using Refinements::Array
 
       refine PStore.singleton_class do
         def with path, mode: :default

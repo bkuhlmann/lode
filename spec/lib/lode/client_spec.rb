@@ -7,7 +7,7 @@ require "spec_helper"
 RSpec.describe Lode::Client do
   include Dry::Monads[:result]
 
-  using Refinements::Pathnames
+  using Refinements::Pathname
 
   subject(:client) { described_class.new path }
 

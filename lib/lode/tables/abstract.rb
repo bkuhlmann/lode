@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "dry/monads"
-require "refinements/arrays"
+require "refinements/array"
 
 module Lode
   module Tables
@@ -9,7 +9,7 @@ module Lode
     class Abstract
       include Dry::Monads[:result]
 
-      using Refinements::Arrays
+      using Refinements::Array
 
       def initialize store, key, setting: Setting.new
         @store = store

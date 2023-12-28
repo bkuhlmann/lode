@@ -6,7 +6,7 @@ module Lode
   # Models the default configuration.
   Configuration = Struct.new :store, :mode, :table, :primary_key, :registry do
     using Refines::PersistentStore
-    using Refinements::Arrays
+    using Refinements::Array
 
     def initialize store: PStore,
                    mode: :default,

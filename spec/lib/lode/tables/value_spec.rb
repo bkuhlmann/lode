@@ -8,7 +8,7 @@ require SPEC_ROOT.join("support/fixtures/link").to_s
 RSpec.describe Lode::Tables::Value do
   include Dry::Monads[:result]
 
-  using Refinements::Pathnames
+  using Refinements::Pathname
 
   subject(:table) { described_class.new store, :links, setting: Lode::Setting[model: record.class] }
 
