@@ -2,8 +2,8 @@
 
 == 1.0.1 (2024-01-07)
 
-✅ Fixed client initialization to ensure path ancestors exist - Brooke Kuhlmann
-✅ Fixed peristent store refinement class description - Brooke Kuhlmann
+* ✅ Fixed client initialization to ensure path ancestors exist - Brooke Kuhlmann
+* ✅ Fixed peristent store refinement class description - Brooke Kuhlmann
 
 == 1.0.0 (2024-01-01)
 
