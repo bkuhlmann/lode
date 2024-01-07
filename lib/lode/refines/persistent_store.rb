@@ -5,7 +5,7 @@ require "refinements/array"
 
 module Lode
   module Refines
-    # Refined and enhanced PStore functionality.
+    # Refines and enhances PStore functionality.
     module PersistentStore
       using Refinements::Array
 
