@@ -9,9 +9,9 @@
 
 = Lode
 
-Lode -- as in a geological deposit or a vein of minerals -- is a {pstore_link} of object data that can be mined for valuable information.
+Lode -- as in geological deposit or a vein of minerals -- is a {pstore_link} of object data that can be mined for valuable information.
 
-As noted in the {pstore_link} documentation all objects are marshaled which is not without caveats and dangers but, if you only need a simple object store, {pstore_link} is a solution. Lode takes this a step further by allowing you to have a pipeline workflow with a Domain Specific Language (DSL) for creating, updating, finding, and deleting records.
+As noted in the {pstore_link} documentation all objects are marshaled which is not without caveats and dangers but, if you only need a simple object store, {pstore_link} is a solution. Lode takes this a step further by allowing you to have a pipeline workflow along with a Domain Specific Language (DSL) for creating, updating, finding, and deleting records.
 
 toc::[]
 
@@ -140,6 +140,19 @@ Each key can be configured as follows:
 ** `Lode::Tables::Value`: Allows you to interact with whole value objects like `Data`, `Struct`, or link:https://alchemists.io/projects/wholable[whole value objects] in general which have attribute readers and writers.
 * `primary_key`: Defines the primary key used when interacting with your table of records (useful when finding or upserting records). Default: `:id`.
 * `registry`: Used for registering default settings for your tables. _This is not meant to be used directly_ but is documented for transparency.
+
+=== Paths
+
+Upon initialization, and when given a file, the file is only created once you start saving records. Although, when given a nested path, the full parent path will be created in anticipation of the file eventually being created. Example:
+
+[source,ruby]
+----
+# The file, "demo.store", is not created until data is saved.
+Lode.new "demo.store"
+
+# The path, "a/nested/path", will be created so `demo.store` can eventually be saved.
+Lode.new "a/nested/path/demo.store"
+----
 
 === Registry
 
