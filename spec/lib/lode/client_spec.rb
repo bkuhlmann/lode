@@ -42,6 +42,13 @@ RSpec.describe Lode::Client do
         "store=PStore, mode=:thread, table=Lode::Tables::Value, primary_key=:slug, registry={}"
       )
     end
+
+    it "ensures nested path ancestors exist" do
+      path = temp_dir.join "one/two/test.store"
+      described_class.new path
+
+      expect(path.parent.exist?).to be(true)
+    end
   end
 
   describe "#register" do

@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 require "forwardable"
+require "refinements/pathname"
 
 module Lode
   # Provides an enhanced PStore-based client.
   class Client
     extend Forwardable
+
+    using Refinements::Pathname
 
     attr_reader :path, :store
 
@@ -14,7 +17,7 @@ module Lode
     def initialize path, configuration: Configuration.new
       yield configuration if block_given?
 
-      @path = path
+      @path = Pathname(path).make_ancestors
       @configuration = configuration
       @store = configuration.store_for path
     end
