@@ -1,5 +1,13 @@
 = Versions
 
+== 1.1.0 (2024-02-19)
+
+* ✅ Fixed RuboCop Lint/RedundantCopDisableDirective issue - Brooke Kuhlmann
+* ✅ Fixed version bullets - Brooke Kuhlmann
+* 🟢 Added repl_type_completor gem - Brooke Kuhlmann
+* 🔼 Updated to Caliber 0.50.0 - Brooke Kuhlmann
+* 🔼 Updated to Reek 6.3.0 - Brooke Kuhlmann
+
 == 1.0.1 (2024-01-07)
 
 * ✅ Fixed client initialization to ensure path ancestors exist - Brooke Kuhlmann
