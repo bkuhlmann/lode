@@ -20,7 +20,7 @@ RSpec.describe Lode do
     let(:path) { temp_dir.join "test.store" }
 
     it "answers client instance" do
-      expect(described_class.new(path)).to be_a(Lode::Client)
+      expect(described_class.new(path)).to be_a(described_class::Client)
     end
   end
 end
