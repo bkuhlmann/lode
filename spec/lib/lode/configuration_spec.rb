@@ -23,7 +23,7 @@ RSpec.describe Lode::Configuration do
     it "registers table model and primary key" do
       configuration.register :users, model: Hash, primary_key: :external_id
 
-      expect(configuration.registry).to eq( \
+      expect(configuration.registry).to eq(
         users: Lode::Setting[model: Hash, primary_key: :external_id]
       )
     end
