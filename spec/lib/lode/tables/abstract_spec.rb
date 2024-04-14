@@ -35,7 +35,7 @@ RSpec.describe Lode::Tables::Abstract do
         expectation = proc { table.find 1 }
 
         expect(&expectation).to raise_error(
-          NotImplementedError,
+          NoMethodError,
           /Lode::Tables::Abstract#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end
@@ -48,7 +48,7 @@ RSpec.describe Lode::Tables::Abstract do
         expectation = proc { table.upsert record }
 
         expect(&expectation).to raise_error(
-          NotImplementedError,
+          NoMethodError,
           /Lode::Tables::Abstract#upsert \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end
@@ -61,7 +61,7 @@ RSpec.describe Lode::Tables::Abstract do
         expectation = proc { table.delete 1 }
 
         expect(&expectation).to raise_error(
-          NotImplementedError,
+          NoMethodError,
           /Lode::Tables::Abstract#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end

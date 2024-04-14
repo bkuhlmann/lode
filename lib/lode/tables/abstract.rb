@@ -23,12 +23,12 @@ module Lode
       def all = Success records.dup.freeze
 
       def find value, key: primary_key
-        fail NotImplementedError,
+        fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
       end
 
       def upsert value, key: primary_key
-        fail NotImplementedError,
+        fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
       end
 
