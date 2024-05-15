@@ -27,6 +27,9 @@ module Lode
     def write(key, &) = transact(:commit, key, &)
 
     def commit(key, &)
+      warn "`#{self.class}##{__method__}` is deprecated, use `#write` instead.",
+           category: :deprecated
+
       write(key, &)
     end
 

@@ -124,6 +124,14 @@ RSpec.describe Lode::Client do
 
       expect(records).to eq(Success([]))
     end
+
+    it "outputs deprecation warning" do
+      local_record = record
+      expectation = proc { client.commit(:links) { upsert local_record } }
+      message = "`Lode::Client#commit` is deprecated, use `#write` instead.\n"
+
+      expect(&expectation).to output(message).to_stderr
+    end
   end
 
   describe "#write" do
