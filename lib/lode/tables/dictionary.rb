@@ -8,10 +8,10 @@ module Lode
     class Dictionary < Abstract
       include Dry::Monads[:result]
 
-      def upsert value, key: primary_key
-        find(value[key]).either(
-          -> existing { update existing, value },
-          proc { append value }
+      def upsert change, key: primary_key
+        find(change[key], key:).either(
+          -> existing { revise existing, change },
+          proc { append change }
         )
       end
 

@@ -8,11 +8,11 @@ module Lode
     class Value < Abstract
       include Dry::Monads[:result]
 
-      def upsert value, key: primary_key
-        record = record_for value
+      def upsert change, key: primary_key
+        record = record_for change
 
         find(primary_id(record, key:)).either(
-          -> existing { update existing, record },
+          -> existing { revise existing, record },
           proc { append record }
         )
       end
@@ -24,9 +24,9 @@ module Lode
       private
 
       # :reek:FeatureEnvy
-      def record_for value
+      def record_for change
         model = setting.model
-        value.is_a?(model) ? value : model[**value.to_h]
+        change.is_a?(model) ? change : model[**change.to_h]
       end
     end
   end

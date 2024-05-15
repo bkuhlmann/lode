@@ -42,7 +42,7 @@ RSpec.describe Lode::Tables::Abstract do
 
         expect(&expectation).to raise_error(
           NoMethodError,
-          /#primary_id \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+          /#primary_id \[\[:req, :record\], \[:key, :key\]\]` must be implemented./
         )
       end
     end
@@ -55,7 +55,7 @@ RSpec.describe Lode::Tables::Abstract do
 
         expect(&expectation).to raise_error(
           NoMethodError,
-          /#upsert \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+          /#upsert \[\[:req, :record\], \[:key, :key\]\]` must be implemented./
         )
       end
     end

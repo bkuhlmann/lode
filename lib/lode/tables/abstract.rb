@@ -22,33 +22,33 @@ module Lode
 
       def all = Success records.dup.freeze
 
-      def find value, key: primary_key
-        records.find { |record| primary_id(record, key:) == value }
+      def find id, key: primary_key
+        records.find { |record| primary_id(record, key:) == id }
                .then do |record|
                  return Success record if record
 
-                 Failure "Unable to find #{key}: #{value.inspect}."
+                 Failure "Unable to find #{key}: #{id.inspect}."
                end
       end
 
-      def create value, key: primary_key
-        id = primary_id(value, key:)
+      def create record, key: primary_key
+        id = primary_id(record, key:)
 
         find(id, key:).bind { Failure "Record exists for #{key}: #{id}." }
                       .or do |error|
-                        return append value if error.include? "Unable to find"
+                        return append record if error.include? "Unable to find"
 
                         Failure error
                       end
       end
 
-      def upsert value, key: primary_key
+      def upsert record, key: primary_key
         fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
       end
 
-      def delete value, key: primary_key
-        find(value, key:).fmap do |record|
+      def delete id, key: primary_key
+        find(id, key:).fmap do |record|
           records.delete record
           store[key] = records
           record
@@ -59,15 +59,15 @@ module Lode
 
       attr_reader :store, :key, :setting, :records
 
-      def primary_id value, key: primary_key
+      def primary_id record, key: primary_key
         fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
       end
 
-      def update existing, record
-        records.supplant existing, record
+      def revise existing, change
+        records.supplant existing, change
         store[key] = records
-        Success record
+        Success change
       end
 
       def append record
