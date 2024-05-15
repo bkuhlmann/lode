@@ -9,7 +9,7 @@ module Lode
       include Dry::Monads[:result]
 
       def find value, key: primary_key
-        records.find { |record| record[key] == value }
+        records.find { |record| primary_id(record, key:) == value }
                .then do |record|
                  return Success record if record
 
@@ -23,6 +23,10 @@ module Lode
           proc { append value }
         )
       end
+
+      protected
+
+      def primary_id(record, key: primary_key) = record[key]
     end
   end
 end

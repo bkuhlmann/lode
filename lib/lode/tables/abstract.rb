@@ -27,6 +27,15 @@ module Lode
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
       end
 
+      def create value, key: primary_key
+        id = primary_id(value, key:)
+
+        find(id, key:).bind { Failure "Record exists for #{key}: #{id}." }
+                      .or do |error|
+                        error.include?("Unable to find") ? append(value) : Failure(error)
+                      end
+      end
+
       def upsert value, key: primary_key
         fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
@@ -43,6 +52,11 @@ module Lode
       protected
 
       attr_reader :store, :key, :setting, :records
+
+      def primary_id value, key: primary_key
+        fail NoMethodError,
+             "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
+      end
 
       def update existing, record
         records.supplant existing, record

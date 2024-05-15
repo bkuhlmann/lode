@@ -36,7 +36,20 @@ RSpec.describe Lode::Tables::Abstract do
 
         expect(&expectation).to raise_error(
           NoMethodError,
-          /Lode::Tables::Abstract#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+          /#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+        )
+      end
+    end
+  end
+
+  describe "#create" do
+    it "fails when not implemented" do
+      store.transaction do
+        expectation = proc { table.create record }
+
+        expect(&expectation).to raise_error(
+          NoMethodError,
+          /#primary_id \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end
     end
@@ -49,7 +62,7 @@ RSpec.describe Lode::Tables::Abstract do
 
         expect(&expectation).to raise_error(
           NoMethodError,
-          /Lode::Tables::Abstract#upsert \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+          /#upsert \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end
     end
@@ -62,7 +75,7 @@ RSpec.describe Lode::Tables::Abstract do
 
         expect(&expectation).to raise_error(
           NoMethodError,
-          /Lode::Tables::Abstract#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
+          /#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
         )
       end
     end

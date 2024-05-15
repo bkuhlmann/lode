@@ -9,7 +9,7 @@ module Lode
       include Dry::Monads[:result]
 
       def find value, key: primary_key
-        records.find { |record| record.public_send(key) == value }
+        records.find { |record| primary_id(record, key:) == value }
                .then do |record|
                  return Success record if record
 
@@ -20,11 +20,15 @@ module Lode
       def upsert value, key: primary_key
         record = record_for value
 
-        find(record.public_send(key)).either(
+        find(primary_id(record, key:)).either(
           -> existing { update existing, record },
           proc { append record }
         )
       end
+
+      protected
+
+      def primary_id(record, key: primary_key) = record.public_send(key)
 
       private
 

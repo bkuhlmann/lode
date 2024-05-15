@@ -4,15 +4,35 @@ RSpec.shared_examples "with table operations" do
   include Dry::Monads[:result]
 
   describe "#find" do
-    it "answers record (value object) if found" do
+    it "answers record" do
       store.transaction do
         table.upsert record
         expect(table.find(1)).to eq(Success(record))
       end
     end
 
-    it "answers failure when record (value object) is not found" do
+    it "answers failure when record is not found" do
       store.transaction { expect(table.find(13)).to eq(Failure("Unable to find id: 13.")) }
+    end
+  end
+
+  describe "#create" do
+    it "creates record" do
+      store.transaction do
+        table.create record
+        expect(table.all).to eq(Success([record]))
+      end
+    end
+
+    it "answers created record" do
+      store.transaction { expect(table.create(record)).to eq(Success(record)) }
+    end
+
+    it "answers failure when when record exists" do
+      store.transaction do
+        table.create record
+        expect(table.create(record)).to eq(Failure("Record exists for id: 1."))
+      end
     end
   end
 
@@ -62,7 +82,7 @@ RSpec.shared_examples "with table operations" do
       end
     end
 
-    it "answers nil when record doesn't exist" do
+    it "answers failure when record doesn't exist" do
       store.transaction { expect(table.delete(13)).to eq(Failure("Unable to find id: 13.")) }
     end
   end

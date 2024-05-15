@@ -23,4 +23,5 @@ detectors:
   UnusedParameters:
     exclude:
       - "Lode::Tables::Abstract#find"
+      - "Lode::Tables::Abstract#primary_id"
       - "Lode::Tables::Abstract#upsert"
