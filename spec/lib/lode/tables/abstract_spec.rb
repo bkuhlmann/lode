@@ -48,6 +48,19 @@ RSpec.describe Lode::Tables::Abstract do
     end
   end
 
+  describe "#update" do
+    it "fails when not implemented" do
+      store.transaction do
+        expectation = proc { table.update record }
+
+        expect(&expectation).to raise_error(
+          NoMethodError,
+          /#primary_id \[\[:req, :record\], \[:key, :key\]\]` must be implemented./
+        )
+      end
+    end
+  end
+
   describe "#upsert" do
     it "fails when not implemented" do
       store.transaction do

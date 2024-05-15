@@ -15,6 +15,33 @@ RSpec.describe Lode::Tables::Dictionary do
 
   include_examples "with table operations"
 
+  describe "#update" do
+    let(:change) { record.merge label: "Mod" }
+
+    it "updates record" do
+      store.transaction do
+        table.create record
+        table.update change
+
+        expect(table.all).to eq(Success([change]))
+      end
+    end
+
+    it "answers updated record" do
+      store.transaction do
+        table.create record
+        expect(table.update(change)).to eq(Success(change))
+      end
+    end
+
+    it "answers failure when when record can't be found" do
+      store.transaction do
+        table.update record
+        expect(table.update(record)).to eq(Failure("Unable to find id: 1."))
+      end
+    end
+  end
+
   describe "#upsert" do
     it "updates existing record" do
       update = record.merge label: "Different"

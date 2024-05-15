@@ -42,6 +42,11 @@ module Lode
                       end
       end
 
+      def update change, key: primary_key
+        id = primary_id(change, key:)
+        find(id, key:).bind { |existing| revise existing, change }
+      end
+
       def upsert record, key: primary_key
         fail NoMethodError,
              "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
