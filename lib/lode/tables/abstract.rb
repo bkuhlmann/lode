@@ -23,8 +23,12 @@ module Lode
       def all = Success records.dup.freeze
 
       def find value, key: primary_key
-        fail NoMethodError,
-             "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
+        records.find { |record| primary_id(record, key:) == value }
+               .then do |record|
+                 return Success record if record
+
+                 Failure "Unable to find #{key}: #{value.inspect}."
+               end
       end
 
       def create value, key: primary_key
@@ -32,7 +36,9 @@ module Lode
 
         find(id, key:).bind { Failure "Record exists for #{key}: #{id}." }
                       .or do |error|
-                        error.include?("Unable to find") ? append(value) : Failure(error)
+                        return append value if error.include? "Unable to find"
+
+                        Failure error
                       end
       end
 

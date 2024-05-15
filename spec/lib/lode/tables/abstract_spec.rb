@@ -30,15 +30,8 @@ RSpec.describe Lode::Tables::Abstract do
   end
 
   describe "#find" do
-    it "fails when not implemented" do
-      store.transaction do
-        expectation = proc { table.find 1 }
-
-        expect(&expectation).to raise_error(
-          NoMethodError,
-          /#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
-        )
-      end
+    it "answers failure when not found" do
+      store.transaction { expect(table.find(1)).to eq(Failure("Unable to find id: 1.")) }
     end
   end
 
@@ -69,15 +62,8 @@ RSpec.describe Lode::Tables::Abstract do
   end
 
   describe "#delete" do
-    it "fails when not implemented" do
-      store.transaction do
-        expectation = proc { table.delete 1 }
-
-        expect(&expectation).to raise_error(
-          NoMethodError,
-          /#find \[\[:req, :value\], \[:key, :key\]\]` must be implemented./
-        )
-      end
+    it "answers failure when not found" do
+      store.transaction { expect(table.delete(1)).to eq(Failure("Unable to find id: 1.")) }
     end
   end
 end

@@ -8,15 +8,6 @@ module Lode
     class Value < Abstract
       include Dry::Monads[:result]
 
-      def find value, key: primary_key
-        records.find { |record| primary_id(record, key:) == value }
-               .then do |record|
-                 return Success record if record
-
-                 Failure "Unable to find #{key}: #{value.inspect}."
-               end
-      end
-
       def upsert value, key: primary_key
         record = record_for value
 
