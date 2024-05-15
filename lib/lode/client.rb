@@ -24,7 +24,11 @@ module Lode
 
     def read(key, &) = transact(__method__, key, &)
 
-    def commit(key, &) = transact(__method__, key, &)
+    def write(key, &) = transact(:commit, key, &)
+
+    def commit(key, &)
+      write(key, &)
+    end
 
     private
 

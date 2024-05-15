@@ -125,4 +125,30 @@ RSpec.describe Lode::Client do
       expect(records).to eq(Success([]))
     end
   end
+
+  describe "#write" do
+    let(:records) { client.write(:links, &:all) }
+
+    it "creates and updates a record" do
+      modification = record.merge label: "Updated Test"
+      local_record = record
+
+      client.write :links do
+        upsert(local_record).fmap { upsert modification }
+      end
+
+      expect(records).to eq(Success([modification]))
+    end
+
+    it "creates and deletes a record" do
+      local_record = record
+
+      client.write :links do
+        upsert local_record
+        delete local_record[:id]
+      end
+
+      expect(records).to eq(Success([]))
+    end
+  end
 end
