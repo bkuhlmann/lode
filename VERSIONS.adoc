@@ -1,5 +1,16 @@
 = Versions
 
+== 1.4.0 (2024-05-16)
+
+* 🟢 Added client commit deprecation warning - Brooke Kuhlmann
+* 🟢 Added client write method - Brooke Kuhlmann
+* 🟢 Added table record creation - Brooke Kuhlmann
+* 🟢 Added table record updating - Brooke Kuhlmann
+* 🔼 Updated RSpec configuration to ignore backtraces in pending specs - Brooke Kuhlmann
+* 🔼 Updated to Ruby 3.3.1 - Brooke Kuhlmann
+* 🔁 Refactored abstract table to implement find - Brooke Kuhlmann
+* 🔁 Refactored tables to use self describing parameters - Brooke Kuhlmann
+
 == 1.3.0 (2024-04-21)
 
 * ✅ Fixed not implemented errors to be no method errors instead - Brooke Kuhlmann

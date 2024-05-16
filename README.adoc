@@ -20,7 +20,7 @@ toc::[]
 - Built atop {pstore_link}.
 - Uses the _Railway Pattern_ via {dry_monads_link} for fault tolerant pipelines.
 - Emphasizes use of `Hash`, `Data`, `Struct`, or link:https://alchemists.io/projects/wholable[whole value objects] in general.
-- Great for {xdg_link} caches, simple file-based databases, or simple file stores in general.
+- Great for {xdg_link} caches, lightweight file-based databases, or simple file stores in general.
 
 == Requirements
 
@@ -66,32 +66,54 @@ To use, create a Lode instance and then use database-like messages to interact w
 ----
 lode = Lode.new "demo.store"
 
-lode.commit :links do
-  upsert({id: 1, url: "https://one.com"})
-  upsert({id: 2, url: "https://2.com"})
-  upsert({id: 3, url: "https://three.com"})
+lode.write :links do
+  create({id: 1, url: "https://one.com"})
+  create({id: 2, url: "https://2.com"})
+  create({id: 3, url: "https://three.com"})
 end
 
 # Success({:id=>3, :url=>"https://three.com"})
-# (only the last record created/updated is answered back)
+# (only the last record created is answered back)
 
-lode.commit(:links) { upsert({id: 2, url: "https://two.com"}) }
+lode.write(:links) { create({id: 4, url: "https://four.io"}) }
+# Success({:id=>4, :url=>"https://four.io"})
+
+lode.write(:links) { create({id: 4, url: "https://four.io"}) }
+# Failure("Record exists for id: 4.")
+
+lode.write(:links) { update({id: 1, url: "https://one.demo"}) }
+# Success({:id=>1, :url=>"https://one.demo"})
+
+lode.write(:links) { update({id: 5, url: "https://five.bogus"}) }
+# Failure("Unable to find id: 5.")
+
+lode.write(:links) { upsert({id: 2, url: "https://two.com"}) }
 # Success({:id=>2, :url=>"https://two.com"})
 
-lode.commit(:links) { find 1 }
-# Success({:id=>1, :url=>"https://one.com"})
+lode.write(:links) { upsert({id: 5, url: "https://five.demo"}) }
+# Success({:id=>5, :url=>"https://five.demo"})
 
-lode.commit(:links) { find 13 }
+lode.read(:links) { find 1 }
+# Success({:id=>1, :url=>"https://one.demo"})
+
+lode.read(:links) { find 13 }
 # Failure("Unable to find id: 13.")
 
-lode.commit(:links) { delete 2 }
+lode.write(:links) { delete 2 }
 # Success({:id=>2, :url=>"https://two.com"})
 
-lode.commit(:links) { delete 13 }
+lode.write(:links) { delete 13 }
 # Failure("Unable to find id: 13.")
 
-lode.commit(:links, &:all)
-# Success([{:id=>1, :url=>"https://one.com"}, {:id=>3, :url=>"https://three.com"}])
+lode.read(:links, &:all)
+# Success(
+#   [
+#     {:id=>1, :url=>"https://one.demo"},
+#     {:id=>3, :url=>"https://three.com"},
+#     {:id=>4, :url=>"https://four.io"},
+#     {:id=>5, :url=>"https://five.demo"}
+#   ]
+# )
 ----
 
 The default configuration is set up to use a primitive `Hash` which is the default behavior when using {pstore_link}. Everything answered back is a result monad as provided by the {dry_monads_link} gem so you can leverage the _Railway Pattern_ to build robust, fault tolerant, pipelines.
@@ -178,7 +200,7 @@ Given the above, you could now create and find _link_ records by _slug_ like so:
 
 [source,ruby]
 ----
-lode.commit(:links) { upsert({id: 1, slug: :demo, url: "https://demo.com"}) }
+lode.write(:links) { upsert({id: 1, slug: :demo, url: "https://demo.com"}) }
 lode.read(:links) { find :demo }
 
 # Success({:id=>1, :slug=>:demo, :url=>"https://demo.com"})
@@ -201,7 +223,7 @@ As mentioned when configuring a Lode instance, two _types_ of tables are availab
 [source,ruby]
 ----
 lode = Lode.new "demo.store"
-lode.commit(:links) { upsert({id: 1, url: "https://one.com"}) }
+lode.write(:links) { upsert({id: 1, url: "https://one.com"}) }
 # Success({:id=>1, :url=>"https://one.com"})
 ----
 
@@ -216,13 +238,13 @@ lode = Lode.new("demo.store") do |config|
   config.register :links, model: Model
 end
 
-lode.commit :links do
+lode.write :links do
   upsert({id: 1, url: "https://one.com"})
-  upsert Model[id: 2, url: "https://"]
+  upsert Model[id: 2, url: "https://two.com"]
 end
 
-lode.commit(:links, &:all)
-# Success([#<data Model id=1, url="https://one.com">, #<data Model id=2, url="https://">])
+lode.read(:links, &:all)
+# Success([#<data Model id=1, url="https://one.com">, #<data Model id=2, url="https://two.com">])
 ----
 
 The above would work with a `Struct` or any value object. One of many conveniences when using value objects -- as shown above -- is you can upsert records using a `Hash` or an instance of your value object.
@@ -231,7 +253,9 @@ Each table supports the following methods:
 
 * `#primary_key`: Answers the primary key as defined when the table was registered or the default key (i.e. `:id`).
 * `#all`: Answers all records for a table.
-* `#find`: Finds a record by primary key.
+* `#find`: Finds an existing record by primary key or answers a failure if not found.
+* `#create`: Creates a new record by primary key or answers a failure if record already exists.
+* `#update`: Updates an existing record by primary key or answers a failure if the record can't be found.
 * `#upsert`: Creates or updates a new or existing record by primary key.
 * `#delete`: Deletes an existing record by primary key.
 
@@ -241,8 +265,8 @@ All of the above (except `#primary_key`) support an optional `:key` keyword argu
 
 You've already seen a few examples of how to read and write to your object store but, to be explicit, the following are supported:
 
-* `#commit`: Allows you to read and write records as a single transaction.
-* `#read`: Allows you to _only_ read data from your object store as a single transaction. Write operations will result in an exception.
+* `#read`: Allows you to _only_ read data from your object store in a single transaction. Any write operation will result in an exception.
+* `#write`: Allows you to write (and read) records in a single transaction.
 
 Both of the above methods require you to supply the table name and a block with operations. Since a table name must always be supplied this means you can interact with multiple tables within the same file store or you can write different tables to different files. Up to you. Here's an example of a basic write and read operation:
 
@@ -250,14 +274,14 @@ Both of the above methods require you to supply the table name and a block with 
 ----
 lode = Lode.new "demo.store"
 
-# Read/Write
-lode.commit(:links) { upsert({id: 1, url: "https://demo.com"}) }
-
 # Read Only
 lode.read(:links) { find 1 }
+
+# Write/Read
+lode.write(:links) { upsert({id: 1, url: "https://demo.com"}) }
 ----
 
-Attempting to `#read` with a _write_ operation will result in an error. Example:
+Attempting to _write_ within a _read_ transaction will result in an error. For example, notice `delete` is being used within the `read` transaction which causes an exception:
 
 [source,ruby]
 ----
@@ -265,7 +289,7 @@ lode.read(:links) { delete 1 }
 # in read-only transaction (PStore::Error)
 ----
 
-For those familiar with {pstore_link} behavior, a commit and read operation is the equivalent of the following using `PStore` directly:
+For those familiar with {pstore_link} behavior, a write and read operation is the equivalent of the following using `PStore` directly:
 
 [source,ruby]
 ----
@@ -273,7 +297,7 @@ require "pstore"
 
 store = PStore.new "demo.store"
 
-# Read/Write
+# Write/Read
 store.transaction do |store|
   store[:links] = store.fetch(:links, []).append({id: 1, url: "https://demo.com"})
 end
