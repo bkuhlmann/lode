@@ -1,5 +1,12 @@
 = Versions
 
+== 1.5.0 (2024-06-01)
+
+* ✅ Fixed gem certificate URL for secure installs - Brooke Kuhlmann
+* 🟢 Added IRB Kit gem - Brooke Kuhlmann
+* 🔼 Updated citation URLs - Brooke Kuhlmann
+* 🔼 Updated to Ruby 3.3.2 - Brooke Kuhlmann
+
 == 1.4.0 (2024-05-16)
 
 * 🟢 Added client commit deprecation warning - Brooke Kuhlmann
