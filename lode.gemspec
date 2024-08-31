@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/bkuhlmann/lode/issues",
     "changelog_uri" => "https://alchemists.io/projects/lode/versions",
-    "documentation_uri" => "https://alchemists.io/projects/lode",
+    "homepage_uri" => "https://alchemists.io/projects/lode",
     "funding_uri" => "https://github.com/sponsors/bkuhlmann",
     "label" => "Lode",
     "rubygems_mfa_required" => "true",
