@@ -1,5 +1,10 @@
 = Versions
 
+== 1.9.0 (2024-10-17)
+
+* 🔼 Updated to Refinements 12.9.0 - Brooke Kuhlmann
+* 🔼 Updated to Zeitwerk 2.7.0 - Brooke Kuhlmann
+
 == 1.8.1 (2024-09-03)
 
 * ✅ Fixed PStore warning - Brooke Kuhlmann
