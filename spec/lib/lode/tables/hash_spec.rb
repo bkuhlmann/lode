@@ -3,7 +3,7 @@
 require "pstore"
 require "spec_helper"
 
-RSpec.describe Lode::Tables::Dictionary do
+RSpec.describe Lode::Tables::Hash do
   include Dry::Monads[:result]
 
   subject(:table) { described_class.new store, :links }

@@ -4,8 +4,8 @@ require "dry/monads"
 
 module Lode
   module Tables
-    # Provides an array-based table for dictionary or hash-like objects.
-    class Dictionary < Abstract
+    # Provides an array-based table for hash objects.
+    class Hash < Abstract
       include Dry::Monads[:result]
 
       def upsert change, key: primary_key

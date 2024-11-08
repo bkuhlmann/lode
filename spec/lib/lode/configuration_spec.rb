@@ -11,7 +11,7 @@ RSpec.describe Lode::Configuration do
         described_class[
           store: PStore,
           mode: :default,
-          table: Lode::Tables::Dictionary,
+          table: Lode::Tables::Hash,
           primary_key: :id,
           registry: {}
         ]
@@ -59,7 +59,7 @@ RSpec.describe Lode::Configuration do
 
       store.transaction do
         table = configuration.table_for store, :test
-        expect(table).to be_a(Lode::Tables::Dictionary)
+        expect(table).to be_a(Lode::Tables::Hash)
       end
     end
 
@@ -68,7 +68,7 @@ RSpec.describe Lode::Configuration do
 
       store.transaction do
         table = configuration.table_for store, :test
-        expect(table).to be_a(Lode::Tables::Dictionary)
+        expect(table).to be_a(Lode::Tables::Hash)
       end
     end
   end

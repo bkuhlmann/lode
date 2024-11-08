@@ -10,7 +10,7 @@ module Lode
 
     def initialize store: PStore,
                    mode: :default,
-                   table: Tables::Dictionary,
+                   table: Tables::Hash,
                    primary_key: PRIMARY_KEY,
                    registry: {}
       super
