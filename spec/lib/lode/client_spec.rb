@@ -86,7 +86,7 @@ RSpec.describe Lode::Client do
 
     it "answers found record" do
       local_record = record
-      client.commit(:links) { upsert local_record }
+      client.write(:links) { upsert local_record }
       result = client.read(:links) { find local_record[:id] }
 
       expect(result).to eq(Success(record))
@@ -97,40 +97,6 @@ RSpec.describe Lode::Client do
       expectation = proc { client.read(:links) { upsert local_record } }
 
       expect(&expectation).to raise_error(PStore::Error, /read-only/)
-    end
-  end
-
-  describe "#commit" do
-    let(:records) { client.commit(:links, &:all) }
-
-    it "creates and updates a record" do
-      modification = record.merge label: "Updated Test"
-      local_record = record
-
-      client.commit :links do
-        upsert(local_record).fmap { upsert modification }
-      end
-
-      expect(records).to eq(Success([modification]))
-    end
-
-    it "creates and deletes a record" do
-      local_record = record
-
-      client.commit :links do
-        upsert local_record
-        delete local_record[:id]
-      end
-
-      expect(records).to eq(Success([]))
-    end
-
-    it "outputs deprecation warning" do
-      local_record = record
-      expectation = proc { client.commit(:links) { upsert local_record } }
-      message = "`Lode::Client#commit` is deprecated, use `#write` instead.\n"
-
-      expect(&expectation).to output(message).to_stderr
     end
   end
 
