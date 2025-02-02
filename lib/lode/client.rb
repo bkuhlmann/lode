@@ -30,9 +30,9 @@ module Lode
 
     attr_reader :configuration
 
-    def transact mode, key, &block
+    def transact(mode, key, &)
       store.transaction mode == :read do
-        configuration.table_for(store, key).instance_eval(&block)
+        configuration.table_for(store, key).instance_eval(&)
       end
     end
   end
