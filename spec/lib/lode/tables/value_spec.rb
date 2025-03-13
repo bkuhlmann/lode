@@ -6,8 +6,6 @@ require "spec_helper"
 require SPEC_ROOT.join("support/fixtures/link").to_s
 
 RSpec.describe Lode::Tables::Value do
-  include Dry::Monads[:result]
-
   using Refinements::Pathname
 
   subject(:table) { described_class.new store, :links, setting: Lode::Setting[model: record.class] }
@@ -27,21 +25,21 @@ RSpec.describe Lode::Tables::Value do
         table.create record
         table.update change
 
-        expect(table.all).to eq(Success([change]))
+        expect(table.all).to be_success([change])
       end
     end
 
     it "answers updated record" do
       store.transaction do
         table.create record
-        expect(table.update(change)).to eq(Success(change))
+        expect(table.update(change)).to be_success(change)
       end
     end
 
     it "answers failure when when record can't be found" do
       store.transaction do
         table.update record
-        expect(table.update(record)).to eq(Failure("Unable to find id: 1."))
+        expect(table.update(record)).to be_failure("Unable to find id: 1.")
       end
     end
   end
@@ -54,7 +52,7 @@ RSpec.describe Lode::Tables::Value do
         table.upsert record
         table.upsert update
 
-        expect(table.all).to eq(Success([update]))
+        expect(table.all).to be_success([update])
       end
     end
 
@@ -63,7 +61,7 @@ RSpec.describe Lode::Tables::Value do
 
       store.transaction do
         table.upsert record
-        expect(table.upsert(update)).to eq(Success(update))
+        expect(table.upsert(update)).to be_success(update)
       end
     end
   end

@@ -5,8 +5,6 @@ require "pstore"
 require "spec_helper"
 
 RSpec.describe Lode::Client do
-  include Dry::Monads[:result]
-
   using Refinements::Pathname
 
   subject(:client) { described_class.new path }
@@ -89,7 +87,7 @@ RSpec.describe Lode::Client do
       client.write(:links) { upsert local_record }
       result = client.read(:links) { find local_record[:id] }
 
-      expect(result).to eq(Success(record))
+      expect(result).to be_success(record)
     end
 
     it "fails when attempting mutation" do
@@ -111,7 +109,7 @@ RSpec.describe Lode::Client do
         upsert(local_record).fmap { upsert modification }
       end
 
-      expect(records).to eq(Success([modification]))
+      expect(records).to be_success([modification])
     end
 
     it "creates and deletes a record" do
@@ -122,7 +120,7 @@ RSpec.describe Lode::Client do
         delete local_record[:id]
       end
 
-      expect(records).to eq(Success([]))
+      expect(records).to be_success([])
     end
   end
 end

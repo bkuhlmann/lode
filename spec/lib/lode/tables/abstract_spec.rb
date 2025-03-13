@@ -4,8 +4,6 @@ require "pstore"
 require "spec_helper"
 
 RSpec.describe Lode::Tables::Abstract do
-  include Dry::Monads[:result]
-
   subject(:table) { described_class.new store, :links }
 
   include_context "with temporary directory"
@@ -21,7 +19,7 @@ RSpec.describe Lode::Tables::Abstract do
 
   describe "#all" do
     it "answers records" do
-      store.transaction { expect(table.all).to eq(Success([])) }
+      store.transaction { expect(table.all).to be_success([]) }
     end
 
     it "answers frozen records" do
@@ -31,7 +29,7 @@ RSpec.describe Lode::Tables::Abstract do
 
   describe "#find" do
     it "answers failure when not found" do
-      store.transaction { expect(table.find(1)).to eq(Failure("Unable to find id: 1.")) }
+      store.transaction { expect(table.find(1)).to be_failure("Unable to find id: 1.") }
     end
   end
 
@@ -76,7 +74,7 @@ RSpec.describe Lode::Tables::Abstract do
 
   describe "#delete" do
     it "answers failure when not found" do
-      store.transaction { expect(table.delete(1)).to eq(Failure("Unable to find id: 1.")) }
+      store.transaction { expect(table.delete(1)).to be_failure("Unable to find id: 1.") }
     end
   end
 end
