@@ -11,7 +11,7 @@ RSpec.describe Lode::Tables::Hash do
   let(:store) { PStore.new temp_dir.join("test.store") }
   let(:record) { {id: 1, label: "Test", url: "https://example.com/test"} }
 
-  include_examples "with table operations"
+  it_behaves_like "table operations"
 
   describe "#update" do
     let(:change) { record.merge label: "Mod" }

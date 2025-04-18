@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples "with table operations" do
+RSpec.shared_examples "table operations" do
   describe "#find" do
     it "answers record" do
       store.transaction do

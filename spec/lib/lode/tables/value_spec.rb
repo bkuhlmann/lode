@@ -10,12 +10,11 @@ RSpec.describe Lode::Tables::Value do
 
   subject(:table) { described_class.new store, :links, setting: Lode::Setting[model: record.class] }
 
-  include_context "with temporary directory"
-
   let(:store) { PStore.new temp_dir.join("test.store") }
   let(:record) { Lode::Fixtures::Link[id: 1, label: "Test", url: "https://example.com/test"] }
 
-  include_examples "with table operations"
+  include_context "with temporary directory"
+  it_behaves_like "table operations"
 
   describe "#update" do
     let(:change) { Lode::Fixtures::Link[id: 1, label: "Mod", url: "https://example.com/test"] }
