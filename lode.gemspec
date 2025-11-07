@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.4"
   spec.add_dependency "dry-monads", "~> 1.9"
   spec.add_dependency "pstore", "~> 0.2"
-  spec.add_dependency "refinements", "~> 13.5"
+  spec.add_dependency "refinements", "~> 13.6"
   spec.add_dependency "zeitwerk", "~> 2.7"
 
   spec.extra_rdoc_files = Dir["README*", "LICENSE*"]
